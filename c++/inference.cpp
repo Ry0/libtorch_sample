@@ -28,7 +28,8 @@ int main(int argc, const char* argv[]) {
         inputs_with_feature.push_back(x);
         inputs_with_feature.push_back(feature);
         
-        torch::Tensor output = module.forward(inputs_with_feature).toTensor();
+        // torch::Tensor output = module.forward(inputs_with_feature).toTensor();
+        auto output = module.run_method("forward_inference", x, feature).toTensor();
         std::cout << "With feature output: " << output << std::endl;
     }
     catch (const c10::Error& e) {
@@ -38,10 +39,13 @@ int main(int argc, const char* argv[]) {
     // 2. featureなしのケース (None/nullopt)
     try {
         std::vector<torch::jit::IValue> inputs_without_feature;
+
         inputs_without_feature.push_back(x);
         inputs_without_feature.push_back(torch::nullopt);
         
-        torch::Tensor output = module.forward(inputs_without_feature).toTensor();
+        // torch::Tensor output = module.forward(inputs_without_feature).toTensor();
+        auto output = module.run_method("forward_inference", x, torch::nullopt).toTensor();
+
         std::cout << "Without feature output: " << output << std::endl;
     }
     catch (const c10::Error& e) {
